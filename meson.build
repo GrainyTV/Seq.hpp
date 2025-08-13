@@ -1,29 +1,13 @@
-project(
-    'seq.hpp',
-    'cpp',
-    version: '0.1',
+project('seq.hpp', 'cpp',
     default_options: {
-        'warning_level': '3',
-        'werror': true,
-        'buildtype': 'release'
-})
+        'cpp_std': 'c++17',
+        'warning_level': '3'
+    }
+)
 
-cxx = meson.get_compiler('cpp')
-hdr = include_directories('hdr')
+catch2 = dependency('catch2-with-main')
 
-assert(cxx.compiles('#include "seq/seq.hpp" int main() {}',
-    args: ['-std=c++14'],
-    include_directories: hdr),
-    'Failed to build project with seq.hpp included')
-
-catch2 = subproject('catch2')
-catch2_dep = catch2.get_variable('catch2_with_main_dep')
-
-executable(
-    '@0@.tests'.format(meson.project_name()),
-    'test/test.cpp',
-    dependencies: catch2_dep,
-    cpp_args: [
-        '-std=c++20',
-    ],
-    include_directories: hdr)
+executable('testing', 'test/main.cpp',
+    include_directories: 'hdr',
+    dependencies: catch2
+)
