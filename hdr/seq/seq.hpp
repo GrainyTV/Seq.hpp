@@ -98,4 +98,38 @@ namespace Seq
             return items;
         };
     }
+
+    constexpr inline auto pairwise()
+    {
+        return [](const auto& sequence)
+        {
+            using T = Utils::InnerType<decltype(sequence)>;
+            size_t N = Utils::lengthOfSequence(sequence) - 1;
+
+            std::vector<std::pair<T, T>> items(N);
+            std::transform(beginSelector(sequence),
+                           endSelector(sequence) - 1, // we are consuming two elements at once, stop one iteration earlier
+                           beginSelector(sequence) + 1,
+                           beginSelector(items), [](const T& former, const T& latter) { return std::make_pair(former, latter); });
+
+            return items;
+        };
+    }
+
+    constexpr inline auto pairwiseWrap()
+    {
+        return [](const auto& sequence)
+        {
+            using T = Utils::InnerType<decltype(sequence)>;
+            size_t N = Utils::lengthOfSequence(sequence);
+
+            auto basePairs = sequence | Seq::pairwise();
+
+            std::vector<std::pair<T, T>> items(N);
+            items.back() = std::make_pair(std::get<1>(basePairs.back()), std::get<0>(basePairs.front()));
+            std::move(beginSelector(basePairs), endSelector(basePairs), beginSelector(items));
+
+            return items;
+        };
+    }
 }

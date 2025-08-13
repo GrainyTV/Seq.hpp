@@ -1,6 +1,6 @@
 #include "test_utils.cpp"
 
-TEST_CASE("Print An Array Of Vec2s", "[Seq::iter]")
+TEST_CASE("Print An Array Of Vec2 Values", "[Seq::iter]")
 {
     std::array<Vec2, 4> items = {
         Vec2({1, 2}), Vec2({3, 4}), Vec2({5, 6}), Vec2({7, 8})
@@ -51,7 +51,7 @@ TEST_CASE("Create Numeric Ranges", "[Seq::range]")
     }
 }
 
-TEST_CASE("Filter Out Items From Range")
+TEST_CASE("Filter Out Items From Range", "[Seq::filter]")
 {
     SECTION("Even numbers")
     {
@@ -73,5 +73,24 @@ TEST_CASE("Filter Out Items From Range")
 
         REQUIRE(found.empty());
         REQUIRE(found.capacity() == 5);
+    }
+}
+
+TEST_CASE("Create Pairs From Arbitrary Range")
+{
+    uint32_t nums[4] = { 1, 2, 3, 4 };
+
+    SECTION("Without wrapping")
+    {
+        const auto numPairs = nums | Seq::pairwise();
+        INFO("Capacity: " << numPairs.capacity());
+        REQUIRE(numPairs == std::vector<std::pair<uint32_t, uint32_t>>({ {1, 2}, {2, 3}, {3, 4} }));
+    }
+
+    SECTION("With wrapping")
+    {
+        const auto numPairs = nums | Seq::pairwiseWrap();
+        INFO("Capacity: " << numPairs.capacity());
+        REQUIRE(numPairs == std::vector<std::pair<uint32_t, uint32_t>>({ {1, 2}, {2, 3}, {3, 4}, {4, 1} }));
     }
 }
