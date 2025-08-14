@@ -116,7 +116,7 @@ namespace Seq
         };
     }
 
-    constexpr inline auto pairwiseWrap()
+    constexpr auto pairwiseWrap()
     {
         return [](const auto& sequence)
         {
@@ -131,5 +131,66 @@ namespace Seq
 
             return items;
         };
+    }
+
+    template<typename Predicate>
+    constexpr auto forall(Predicate&& predicate)
+    {
+        return [predicate](const auto& sequence) -> bool
+        {
+            using T = Utils::InnerType<decltype(sequence)>;
+            static_assert(ValidSignature<bool, Predicate, T>, "Signature of Predicate must be <(T) -> bool>");
+
+            return std::all_of(beginSelector(sequence), endSelector(sequence), predicate);
+        };
+    }
+
+    template<typename Mapping>
+    constexpr auto map(Mapping&& mapping)
+    {
+        return [mapping](const auto& sequence)
+        {
+            using Seq = decltype(sequence);
+            using T = Utils::InnerType<Seq>;
+            static_assert(Utils::IsInvocable<Mapping, T>, "Function parameter differs from inner type of enumerable");
+
+            using U = Utils::ReturnValueOf<Mapping, T>;
+            static_assert(ValidSignature<U, Mapping, T>, "Signature of Mapping must be <(T) -> U>");
+
+            if constexpr (Utils::SizeIsKnownAtCompiletime<Seq>)
+            {
+                constexpr size_t N = Utils::LengthOfSequence<Seq>;
+
+                std::array<U, N> items;
+                std::transform(beginSelector(sequence), endSelector(sequence), beginSelector(items), mapping);
+
+                return items;
+            }
+            else
+            {
+                const size_t N = Utils::lengthOfSequence(sequence);
+
+                std::vector<U> items(N);
+                std::transform(beginSelector(sequence), endSelector(sequence), beginSelector(items), mapping);
+
+                return items;
+            }
+        };
+    }
+
+    template<size_t Count, typename Mapping>
+    constexpr auto init(Mapping&& mapping)
+    {
+        static_assert(Utils::IsInvocable<Mapping, size_t>, "Function parameter is expected to be size_t");
+
+        return Seq::range<Count>() | Seq::map(mapping);
+    }
+
+    template<typename Mapping>
+    constexpr auto init(size_t count, Mapping&& mapping)
+    {
+        static_assert(Utils::IsInvocable<Mapping, decltype(count)>, "Function parameter is expected to be size_t");
+
+        return Seq::range(count) | Seq::map(mapping);
     }
 }

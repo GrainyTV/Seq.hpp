@@ -1,6 +1,6 @@
 #include "test_utils.cpp"
 
-TEST_CASE("Print An Array Of Vec2 Values", "[Seq::iter]")
+TEST_CASE("Print A Range Of Vec2 Values", "[Seq::iter]")
 {
     std::array<Vec2, 4> items = {
         Vec2({1, 2}), Vec2({3, 4}), Vec2({5, 6}), Vec2({7, 8})
@@ -76,7 +76,7 @@ TEST_CASE("Filter Out Items From Range", "[Seq::filter]")
     }
 }
 
-TEST_CASE("Create Pairs From Arbitrary Range")
+TEST_CASE("Create Pairs From Arbitrary Range", "[Seq::pairwise][Seq::pairwiseWrap]")
 {
     uint32_t nums[4] = { 1, 2, 3, 4 };
 
@@ -92,5 +92,43 @@ TEST_CASE("Create Pairs From Arbitrary Range")
         const auto numPairs = nums | Seq::pairwiseWrap();
         INFO("Capacity: " << numPairs.capacity());
         REQUIRE(numPairs == std::vector<std::pair<uint32_t, uint32_t>>({ {1, 2}, {2, 3}, {3, 4}, {4, 1} }));
+    }
+}
+
+TEST_CASE("Check Whether All Elements Satisfy Predicate", "[Seq::forall]")
+{
+    uint32_t nums[3] = { 6, 12, 69 };
+
+    REQUIRE((nums | Seq::forall([](uint32_t x) { return x > 0; })));
+    REQUIRE_FALSE((nums | Seq::forall([](uint32_t x) { return x % 2 == 0; })));
+}
+
+TEST_CASE("Initialize Range From Indices", "[Seq::init]")
+{
+    SECTION("@Compile-time")
+    {
+        constexpr auto firstFiveSquares = Seq::init<5>([](size_t i) { return i * i; });
+        STATIC_REQUIRE(firstFiveSquares == std::array<size_t, 5>({ 0, 1, 4, 9, 16 }));
+    }
+
+    SECTION("@Runtime")
+    {
+        auto firstFiveSquares = Seq::init(5, [](size_t i) { return i * i; });
+        REQUIRE(firstFiveSquares == std::vector<size_t>({ 0, 1, 4, 9, 16 }));
+    }
+}
+
+TEST_CASE("Map A Range Of Strings To Their Length", "[Seq::map]")
+{
+    static constexpr std::array<std::string, 3> tokens({ "a", "bbb", "cc" });
+    std::initializer_list<uint32_t> nums = { 1, 3, 5 };
+
+    SECTION("Without index")
+    {
+        constexpr auto lengths = tokens | Seq::map([](const std::string& x) { return x.size(); });
+        STATIC_REQUIRE(lengths == std::array<size_t, 3>({ 1, 3, 2 }));
+
+        auto numsPlusOne = nums | Seq::map([](uint32_t x) { return x + 1; });
+        REQUIRE(numsPlusOne == std::vector<uint32_t>({ 2, 4, 6 }));
     }
 }
