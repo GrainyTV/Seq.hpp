@@ -13,6 +13,12 @@ namespace Utils
 
         template<typename T>
         struct is_size_known_at_compiletime<T, std::void_t<decltype(std::tuple_size<T>::value)>> : std::true_type {};
+
+        template<bool IsComptime, typename T>
+        struct length_of_sequence_or_none : std::integral_constant<size_t, 0> {};
+
+        template<typename T>
+        struct length_of_sequence_or_none<true, T> : std::integral_constant<size_t, std::tuple_size<T>::value> {};
     }
 
     template<typename T>
@@ -22,7 +28,7 @@ namespace Utils
     constexpr bool SizeIsKnownAtCompiletime = _details::is_size_known_at_compiletime<RemoveCVR<Sequence>>::value;
 
     template<typename Sequence>
-    constexpr size_t LengthOfSequence = std::tuple_size<RemoveCVR<Sequence>>::value;
+    constexpr size_t LengthOfSequence = _details::length_of_sequence_or_none<SizeIsKnownAtCompiletime<Sequence>, RemoveCVR<Sequence>>::value;
 
     template<typename Sequence>
     using InnerType = RemoveCVR<decltype(*beginSelector(std::declval<Sequence&>()))>;
@@ -39,3 +45,6 @@ namespace Utils
     template<typename Func, typename... Args>
     using ReturnValueOf = std::invoke_result_t<Func, Args...>;
 }
+
+template<class T, size_t N>
+struct std::tuple_size<T[N]> : integral_constant<size_t, N> {};

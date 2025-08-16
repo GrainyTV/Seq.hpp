@@ -1,0 +1,2 @@
+option('tests', type: 'boolean', value: false, description: 'Whether to build tests')
+option('build_config', type: 'combo', choices: ['header-only', 'static-lib'], value: 'header-only', description: 'How to consume library')
