@@ -299,4 +299,35 @@ namespace Seq
     {
         return std::array<T, 1>({ elem });
     }
+
+    template<typename T>
+    constexpr auto empty()
+    {
+        return std::array<T, 0>();
+    }
+
+    constexpr auto length()
+    {
+        return [](const auto& sequence) -> size_t
+        {
+            using Seq = decltype(sequence);
+
+            if constexpr (Utils::SizeIsKnownAtCompiletime<Seq>)
+            {
+                return Utils::LengthOfSequence<Seq>;
+            }
+            else
+            {
+                return Utils::lengthOfSequence(sequence);
+            }
+        };
+    }
+
+    constexpr auto isEmpty()
+    {
+        return [](const auto& sequence) -> bool
+        {
+            return (sequence | Seq::length()) == 0;
+        };
+    }
 }

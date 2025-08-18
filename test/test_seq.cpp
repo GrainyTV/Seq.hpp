@@ -190,8 +190,35 @@ TEST_CASE("Sum Ranges", "[Seq::sum]")
     }
 }
 
-TEST_CASE("Wrap A Single Item In A Range")
+TEST_CASE("Wrap A Single Item In A Range", "[Seq::singleton]")
 {
     STATIC_REQUIRE(Seq::singleton(7) == std::array<int32_t, 1>({ 7 }));
     STATIC_REQUIRE(Seq::singleton('c') == std::array<char, 1>({ 'c' }));
+}
+
+TEST_CASE("Create An Empty Range", "[Seq::empty]")
+{
+    constexpr auto chainRangesAtCompileTime = []()
+    {
+        std::array<uint32_t, 2> nums = { 1, 2 };
+
+        return
+            Seq::empty<uint32_t>()
+            | Seq::append(nums);
+    };
+
+    STATIC_REQUIRE(Seq::empty<char>() == std::array<char, 0>());
+    STATIC_REQUIRE(chainRangesAtCompileTime() == std::array<uint32_t, 2>({ 1, 2 }));
+}
+
+TEST_CASE("How Many Elements Do Ranges Have", "[Seq::isEmpty][Seq::length]")
+{
+    std::array<uint32_t, 3> notEmpty = { 1, 2, 3 };
+    const char* empty = "";
+
+    STATIC_REQUIRE_FALSE((notEmpty | Seq::isEmpty()));
+    REQUIRE((empty | Seq::isEmpty()));
+
+    STATIC_REQUIRE((notEmpty | Seq::length()) == 3);
+    REQUIRE((empty | Seq::length()) == 0);
 }
