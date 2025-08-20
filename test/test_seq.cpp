@@ -222,3 +222,24 @@ TEST_CASE("How Many Elements Do Ranges Have", "[Seq::isEmpty][Seq::length]")
     STATIC_REQUIRE((notEmpty | Seq::length()) == 3);
     REQUIRE((empty | Seq::length()) == 0);
 }
+
+TEST_CASE("Skipping Elements From A Range", "[Seq::skip][Seq::tail][Seq::take]")
+{
+    constexpr char abcComptime[5] = { 'a', 'b', 'c', 'd', 'e' };
+    std::vector<char> abcRuntime = { 'a', 'b', 'c', 'd', 'e' };
+
+    SECTION("From the beginning")
+    {
+        STATIC_REQUIRE((abcComptime | Seq::tail()) == std::array<char, 4>({ 'b', 'c', 'd', 'e' }));
+        STATIC_REQUIRE((abcComptime | Seq::skip<3>()) == std::array<char, 2>({ 'd', 'e' }));
+
+        REQUIRE((abcRuntime | Seq::tail()) == std::vector<char>({ 'b', 'c', 'd', 'e' }));
+    }
+
+    SECTION("From the end")
+    {
+        STATIC_REQUIRE((abcComptime | Seq::take<1>()) == std::array<char, 1>({ 'a' }));
+
+        REQUIRE((abcRuntime | Seq::take<1>()) == std::vector<char>({ 'a' }));
+    }
+}

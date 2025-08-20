@@ -235,7 +235,7 @@ namespace Seq
     template<size_t Count, typename Mapping>
     constexpr auto init(Mapping&& mapping)
     {
-        static_assert(Utils::IsInvocable<Mapping, size_t>, "Function parameter is expected to be size_t");
+        static_assert(Utils::IsInvocable<Mapping, decltype(Count)>, "Function parameter is expected to be size_t");
 
         return Seq::range<Count>() | Seq::map(mapping);
     }
@@ -328,6 +328,76 @@ namespace Seq
         return [](const auto& sequence) -> bool
         {
             return (sequence | Seq::length()) == 0;
+        };
+    }
+
+    template<size_t Count>
+    constexpr auto skip()
+    {
+        return [](const auto& sequence)
+        {
+            using Seq = decltype(sequence);
+            using T = Utils::InnerType<Seq>;
+
+            if constexpr (Utils::SizeIsKnownAtCompiletime<Seq>)
+            {
+                constexpr size_t N = Utils::LengthOfSequence<Seq>;
+                static_assert(Count < N, "Count must not exceed the number of elements in the enumarable");
+
+                std::array<T, N - Count> items;
+                std::copy(beginSelector(sequence) + Count, endSelector(sequence), beginSelector(items));
+
+                return items;
+            }
+            else
+            {
+                size_t N = Utils::lengthOfSequence(sequence);
+                // TODO: runtime assertion implementation
+
+                std::vector<T> items(N - Count);
+                std::copy(beginSelector(sequence) + Count, endSelector(sequence), beginSelector(items));
+
+                return items;
+            }
+        };
+    }
+
+    constexpr auto tail()
+    {
+        return [](const auto& sequence)
+        {
+            return sequence | Seq::skip<1>();
+        };
+    }
+
+    template<size_t Count>
+    constexpr auto take()
+    {
+        return [](const auto& sequence)
+        {
+            using Seq = decltype(sequence);
+            using T = Utils::InnerType<Seq>;
+
+            if constexpr (Utils::SizeIsKnownAtCompiletime<Seq>)
+            {
+                constexpr size_t N = Utils::LengthOfSequence<Seq>;
+                static_assert(Count <= N, "Count must not exceed the number of elements in the enumarable");
+
+                std::array<T, Count> items;
+                std::copy(beginSelector(sequence), endSelector(sequence) - (N - Count), beginSelector(items));
+
+                return items;
+            }
+            else
+            {
+                size_t N = Utils::lengthOfSequence(sequence);
+                // TODO: runtime assertion implementation
+
+                std::vector<T> items(Count);
+                std::copy(beginSelector(sequence), endSelector(sequence) - (N - Count), beginSelector(items));
+
+                return items;
+            }
         };
     }
 }
