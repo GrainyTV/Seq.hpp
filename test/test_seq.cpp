@@ -243,3 +243,30 @@ TEST_CASE("Skipping Elements From A Range", "[Seq::skip][Seq::tail][Seq::take]")
         REQUIRE((abcRuntime | Seq::take<1>()) == std::vector<char>({ 'a' }));
     }
 }
+
+TEST_CASE("Range Contains An Element", "[Seq::contains]")
+{
+    SECTION("@Compile-time")
+    {
+        constexpr uint32_t nums[2] = { 1, 2 };
+        constexpr bool containsTwo = nums | Seq::contains(2u);
+        constexpr bool containsFive = nums | Seq::contains(5u);
+
+        STATIC_REQUIRE(containsTwo);
+        STATIC_REQUIRE_FALSE(containsFive);
+    }
+
+    SECTION("@Runtime")
+    {
+        std::set<uint32_t> nums = { 1, 2 };
+        bool containsTwo = nums | Seq::contains(2u);
+        bool containsFive = nums | Seq::contains(5u);
+
+        const char* text = "Your base are\nbelong to us";
+        bool isWrapped = text | Seq::contains('\n');
+
+        REQUIRE(containsTwo);
+        REQUIRE_FALSE(containsFive);
+        REQUIRE(isWrapped);
+    }
+}

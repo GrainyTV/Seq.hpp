@@ -400,4 +400,19 @@ namespace Seq
             }
         };
     }
+
+    template<typename U>
+    constexpr auto contains(U&& toFind)
+    {
+        return [toFind](const auto& sequence) -> bool
+        {
+            using T = Utils::InnerType<decltype(sequence)>;
+            static_assert(std::is_same_v<T, U>, "Cannot check if enumerable contains an element with non-matching types");
+
+            return std::any_of(beginSelector(sequence), endSelector(sequence), [toFind](const T& elem)
+            {
+                return elem == toFind;
+            });
+        };
+    }
 }
