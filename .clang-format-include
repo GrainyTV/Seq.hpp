@@ -1,0 +1,5 @@
+# Format all library files
+hdr/seq/**
+
+# Format all test files
+test/**
