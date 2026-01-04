@@ -1,10 +1,10 @@
 #pragma once
-#include "utils/assert.hpp"
 #include "seq/seq.hpp"
+#include "utils/assert.hpp"
 
 #include <array>
-#include <vector>
 #include <string>
+#include <vector>
 
 #define REGISTER_TEST(fun) std::make_pair(fun, "Seq::" #fun)
 
@@ -14,19 +14,18 @@ namespace SeqTest
     {
         auto firstFiveInteger = {1, 2, 3, 4, 5};
 
-        auto everyTwoItems =
-            firstFiveInteger
-            | Seq::chunkBySize(2)
-            | Seq::toVector();
+        auto everyTwoItems = firstFiveInteger | Seq::chunkBySize(2) | Seq::toVector();
 
-        Assert::equal(everyTwoItems, {{1, 2}, {3, 4}, {5}});
+        Assert::equal(everyTwoItems,
+                      {
+                          {1, 2},
+                          {3, 4},
+                          {5}
+        });
 
         const std::string numericText = "12345";
 
-        auto eachDigit =
-            numericText
-            | Seq::chunkBySize(1)
-            | Seq::toVector();
+        auto eachDigit = numericText | Seq::chunkBySize(1) | Seq::toVector();
 
         Assert::equal(eachDigit, {{'1'}, {'2'}, {'3'}, {'4'}, {'5'}});
     }
@@ -46,10 +45,7 @@ namespace SeqTest
     {
         auto firstFiveInteger = {1, 2, 3, 4, 5};
 
-        auto evenNumbers =
-            firstFiveInteger
-            | Seq::filter([](int n) { return n % 2 == 0; })
-            | Seq::toVector();
+        auto evenNumbers = firstFiveInteger | Seq::filter([](int n) { return n % 2 == 0; }) | Seq::toVector();
 
         Assert::equal(evenNumbers, {2, 4});
     }
@@ -68,11 +64,11 @@ namespace SeqTest
     static void isEmpty()
     {
         const std::initializer_list<int> emptyInitializer = {};
-        const bool isZeroLength = emptyInitializer | Seq::isEmpty();
+        const bool isZeroLength                           = emptyInitializer | Seq::isEmpty();
 
         Assert::truthy(isZeroLength);
 
-        auto firstFiveInteger = {1, 2, 3, 4, 5};
+        auto firstFiveInteger      = {1, 2, 3, 4, 5};
         const bool isNotZeroLength = firstFiveInteger | Seq::isEmpty();
 
         Assert::falsey(isNotZeroLength);
@@ -81,11 +77,11 @@ namespace SeqTest
     static void length()
     {
         const std::initializer_list<int> emptyInitializer = {};
-        const std::size_t zeroLength = emptyInitializer | Seq::length();
+        const std::size_t zeroLength                      = emptyInitializer | Seq::length();
 
         Assert::equal(zeroLength, 0ul);
 
-        auto firstFiveInteger = {1, 2, 3, 4, 5};
+        auto firstFiveInteger        = {1, 2, 3, 4, 5};
         const std::size_t fiveLength = firstFiveInteger | Seq::length();
 
         Assert::equal(fiveLength, 5ul);
@@ -95,17 +91,12 @@ namespace SeqTest
     {
         const std::vector<std::string> fruits{"Apple", "Banana", "Orange", "Watermelon"};
 
-        auto fruitLengths =
-            fruits
-            | Seq::map([](const std::string& fruit) { return fruit.size(); })
-            | Seq::toVector();
+        auto fruitLengths = fruits | Seq::map([](const std::string& fruit) { return fruit.size(); }) | Seq::toVector();
 
         Assert::equal(fruitLengths, {5, 6, 6, 10});
 
         auto fruitSlices =
-            fruits
-            | Seq::map([](const std::string& fruit) { return fruit.substr(1, 3); })
-            | Seq::toVector();
+            fruits | Seq::map([](const std::string& fruit) { return fruit.substr(1, 3); }) | Seq::toVector();
 
         Assert::equal(fruitSlices, {"ppl", "ana", "ran", "ate"});
     }
@@ -114,19 +105,19 @@ namespace SeqTest
     {
         auto firstFiveInteger = {1, 2, 3, 4, 5};
 
-        auto integerPairs =
-            firstFiveInteger
-            | Seq::pairwise()
-            | Seq::toVector();
+        auto integerPairs = firstFiveInteger | Seq::pairwise() | Seq::toVector();
 
-        Assert::equal(integerPairs, {{1, 2}, {2, 3}, {3, 4}, {4, 5}});
+        Assert::equal(integerPairs,
+                      {
+                          {1, 2},
+                          {2, 3},
+                          {3, 4},
+                          {4, 5}
+        });
 
         auto onlyOneInteger = {0};
 
-        auto noPairs =
-            onlyOneInteger
-            | Seq::pairwise()
-            | Seq::toVector();
+        auto noPairs = onlyOneInteger | Seq::pairwise() | Seq::toVector();
 
         Assert::equal(noPairs, {});
     }
@@ -135,55 +126,50 @@ namespace SeqTest
     {
         auto firstFiveInteger = {1, 2, 3, 4, 5};
 
-        auto integerPairs =
-            firstFiveInteger
-            | Seq::pairwiseWrap()
-            | Seq::toVector();
+        auto integerPairs = firstFiveInteger | Seq::pairwiseWrap() | Seq::toVector();
 
-        Assert::equal(integerPairs, {{1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 1}});
+        Assert::equal(integerPairs,
+                      {
+                          {1, 2},
+                          {2, 3},
+                          {3, 4},
+                          {4, 5},
+                          {5, 1}
+        });
 
         auto onlyOneInteger = {0};
 
-        auto noPairs =
-            onlyOneInteger
-            | Seq::pairwiseWrap()
-            | Seq::toVector();
+        auto noPairs = onlyOneInteger | Seq::pairwiseWrap() | Seq::toVector();
 
         Assert::equal(noPairs, {});
 
         auto firstTwoInteger = {1, 2};
 
-        auto backToBackPairs =
-            firstTwoInteger
-            | Seq::pairwiseWrap()
-            | Seq::toVector();
+        auto backToBackPairs = firstTwoInteger | Seq::pairwiseWrap() | Seq::toVector();
 
-        Assert::equal(backToBackPairs, {{1, 2}, {2, 1}});
+        Assert::equal(backToBackPairs,
+                      {
+                          {1, 2},
+                          {2, 1}
+        });
     }
 
     static void tail()
     {
         auto firstFiveInteger = {1, 2, 3, 4, 5};
 
-        auto firstFiveIntegerTail =
-            firstFiveInteger
-            | Seq::tail()
-            | Seq::toVector();
+        auto firstFiveIntegerTail = firstFiveInteger | Seq::tail() | Seq::toVector();
 
         Assert::equal(firstFiveIntegerTail, {2, 3, 4, 5});
 
         auto onlyOneInteger = {0};
 
-        auto noTail =
-            onlyOneInteger
-            | Seq::tail()
-            | Seq::toVector();
+        auto noTail = onlyOneInteger | Seq::tail() | Seq::toVector();
 
         Assert::equal(noTail, {});
     }
 
-    constexpr std::array CASES =
-    {
+    constexpr std::array CASES = {
         REGISTER_TEST(chunkBySize),
         REGISTER_TEST(exists),
         REGISTER_TEST(filter),

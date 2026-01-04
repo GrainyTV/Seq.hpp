@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
 #include <format>
+#include <vector>
 
 // ┏━━━━━━━━━━━━━┓
 // ┃ std::vector ┃
@@ -10,16 +10,13 @@ struct std::formatter<std::vector<T>, CharT>
 {
     std::formatter<T, CharT> element_formatter;
 
-    constexpr auto parse(std::basic_format_parse_context<CharT>& ctx)
-    {
-        return element_formatter.parse(ctx);
-    }
+    constexpr auto parse(std::basic_format_parse_context<CharT>& ctx) { return element_formatter.parse(ctx); }
 
     template<typename FormatContext>
     auto format(const std::vector<T>& vec, FormatContext& ctx) const
     {
         auto out = ctx.out();
-        *out++ = CharT('[');
+        *out++   = CharT('[');
 
         for (std::size_t i = 0; i < vec.size(); ++i)
         {
@@ -59,10 +56,10 @@ struct std::formatter<std::pair<T1, T2>, CharT>
         auto out = ctx.out();
 
         *out++ = CharT('(');
-        out = first_formatter.format(p.first, ctx);
+        out    = first_formatter.format(p.first, ctx);
         *out++ = CharT(',');
         *out++ = CharT(' ');
-        out = second_formatter.format(p.second, ctx);
+        out    = second_formatter.format(p.second, ctx);
         *out++ = CharT(')');
 
         return out;

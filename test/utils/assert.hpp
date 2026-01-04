@@ -12,13 +12,7 @@ namespace Assert
         }
     }
 
-    inline void truthy(bool have, sl callsite = sl::current())
-    {
-        Assert::equal(have, true, callsite);
-    }
+    inline void truthy(bool have, sl callsite = sl::current()) { Assert::equal(have, true, callsite); }
 
-    inline void falsey(bool have, sl callsite = sl::current())
-    {
-        Assert::equal(have, false, callsite);
-    }
+    inline void falsey(bool have, sl callsite = sl::current()) { Assert::equal(have, false, callsite); }
 }

@@ -1,6 +1,6 @@
-#include "utils/log.hpp"
-#include "test/test_seq.hpp"
 #include "test/test_isseq.hpp"
+#include "test/test_seq.hpp"
+#include "utils/log.hpp"
 
 static auto evaluate() -> int
 {
@@ -29,7 +29,4 @@ static auto evaluate() -> int
     return failed ? 1 : 0;
 }
 
-auto main() -> int
-{
-    return evaluate();
-}
+auto main() -> int { return evaluate(); }

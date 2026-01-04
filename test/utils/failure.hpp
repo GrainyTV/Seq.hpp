@@ -1,8 +1,8 @@
 #pragma once
 #include <exception>
-#include <string>
 #include <format>
 #include <source_location>
+#include <string>
 
 using sl = std::source_location;
 
@@ -19,13 +19,7 @@ public:
         , at(std::format("@ {}:{}", callsite.file_name(), callsite.line()))
     {}
 
-    const char* what() const noexcept override
-    {
-        return reason.c_str();
-    }
+    const char* what() const noexcept override { return reason.c_str(); }
 
-    const char* where() const noexcept
-    {
-        return at.c_str();
-    }
+    const char* where() const noexcept { return at.c_str(); }
 };

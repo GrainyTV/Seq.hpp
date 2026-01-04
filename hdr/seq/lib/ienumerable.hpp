@@ -53,21 +53,18 @@ private:
 
         explicit IEnumerator(const promise_type::Handle handle)
             : ienumeratorHandle(handle)
-        {
-        }
+        {}
 
         IEnumerator()
             : ienumeratorHandle({})
-        {
-        }
+        {}
     };
 
     promise_type::Handle ienumerableHandle;
 
     explicit IEnumerable(const promise_type::Handle handle)
         : ienumerableHandle(handle)
-    {
-    }
+    {}
 
 public:
     IEnumerator begin() const

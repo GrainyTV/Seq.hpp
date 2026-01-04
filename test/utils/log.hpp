@@ -1,8 +1,9 @@
 #pragma once
-#include <iostream>
-#include <utility>
-#include <string_view>
 #include "formatters.hpp"
+
+#include <iostream>
+#include <string_view>
+#include <utility>
 
 namespace AnsiColor
 {

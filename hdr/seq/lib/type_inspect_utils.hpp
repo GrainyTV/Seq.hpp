@@ -11,7 +11,7 @@ template<typename Func, typename... Args>
 constexpr bool IS_INVOKABLE = std::is_invocable_v<Func, Args...>;
 
 template<typename SeqT>
-concept EnsureIsSeq = requires(const SeqT& sequence) {
+concept EnsureIsSeq = requires (const SeqT& sequence) {
     Seq::_internal::Selectors::beginSelector(sequence);
     Seq::_internal::Selectors::endSelector(sequence);
 };
