@@ -45,7 +45,10 @@ if enable_tests
 endif
 
 if enable_examples
-    example_ids = ['001_readme']
+    example_ids = [
+        '001_readme',
+        '005_ienumerable',
+    ]
 
     foreach id : example_ids
         executable(
