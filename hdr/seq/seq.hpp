@@ -40,7 +40,9 @@ namespace Seq
     inline auto chunkBySize(std::size_t size)
     {
         return [size]<typename T>(IEnumerable<T> sequence) -> IEnumerable<std::vector<T>>
-        { return _internal::chunkBySizeNoCapture(std::move(sequence), size); };
+        {
+            return _internal::chunkBySizeNoCapture(std::move(sequence), size);
+        };
     }
 
     template<typename Predicate>
@@ -64,7 +66,9 @@ namespace Seq
     inline auto filter(Predicate&& pred)
     {
         return [pred = std::forward<Predicate>(pred)]<typename T>(IEnumerable<T> sequence) -> IEnumerable<T>
-        { return _internal::filterNoCapture(std::move(sequence), ByValue(pred)); };
+        {
+            return _internal::filterNoCapture(std::move(sequence), ByValue(pred));
+        };
     }
 
     template<typename Predicate>
@@ -88,12 +92,7 @@ namespace Seq
     {
         return []<typename T>(IEnumerable<T> sequence) -> bool
         {
-            for ([[maybe_unused]] const auto& elem : sequence)
-            {
-                return false;
-            }
-
-            return true;
+            return !(sequence.begin() != sequence.end());
         };
     }
 
@@ -129,7 +128,9 @@ namespace Seq
     {
         return [mapping = std::forward<Mapping>(mapping)]<typename T, typename U = ReturnValueOf<Mapping, T>>(
                    IEnumerable<T> sequence) -> IEnumerable<U>
-        { return _internal::mapNoCapture<U>(std::move(sequence), ByValue(mapping)); };
+        {
+            return _internal::mapNoCapture<U>(std::move(sequence), ByValue(mapping));
+        };
     }
 
     inline auto pairwise()

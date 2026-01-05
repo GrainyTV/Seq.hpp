@@ -20,6 +20,8 @@ public:
 
         void unhandled_exception() {}
 
+        void return_void() {}
+
     private:
         T currentValue;
 

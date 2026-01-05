@@ -79,12 +79,12 @@ namespace SeqTest
         const std::initializer_list<int> emptyInitializer = {};
         const std::size_t zeroLength                      = emptyInitializer | Seq::length();
 
-        Assert::equal(zeroLength, 0ul);
+        Assert::equal<std::size_t>(zeroLength, 0ul);
 
         auto firstFiveInteger        = {1, 2, 3, 4, 5};
         const std::size_t fiveLength = firstFiveInteger | Seq::length();
 
-        Assert::equal(fiveLength, 5ul);
+        Assert::equal<std::size_t>(fiveLength, 5ul);
     }
 
     static void map()
