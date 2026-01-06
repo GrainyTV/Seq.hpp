@@ -4,6 +4,7 @@
 
 #include <array>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #define REGISTER_TEST(fun) std::make_pair(fun, "Seq::" #fun)
@@ -154,6 +155,41 @@ namespace SeqTest
         });
     }
 
+    static void reduce()
+    {
+        auto firstFiveInteger = {1, 2, 3, 4, 5};
+
+        auto intsWithCharacters =
+            firstFiveInteger
+            | Seq::reduce(std::unordered_map<int, char>{}, [](int n, auto map) {
+                    map.emplace(n, 'A' + n);
+                    return map;
+                });
+
+        Assert::equal(intsWithCharacters, {{1, 'B'}, {2, 'C'}, {3, 'D'}, {4, 'E'}, {5, 'F'}});
+
+        const std::string fruitText = "\napple\n\nbanana\npear\nwatermelon";
+
+        auto splitTextByNewline =
+            fruitText
+            | Seq::reduce(std::pair<std::vector<std::string>, std::string>{}, [](char chr, auto& accum) {
+                    std::vector<std::string>& out = accum.first;
+                    std::string& current          = accum.second;
+
+                    if (chr == '\n' && !current.empty())
+                    {
+                        out.emplace_back(current);
+                        current.clear();
+
+                        return std::make_pair(out, current);
+                    }
+
+                    return std::make_pair(out, chr == '\n' ? current : current + chr);
+                });
+
+        Assert::equal(splitTextByNewline, {{"apple", "banana", "pear"}, "watermelon"});
+    }
+
     static void tail()
     {
         auto firstFiveInteger = {1, 2, 3, 4, 5};
@@ -179,6 +215,7 @@ namespace SeqTest
         REGISTER_TEST(map),
         REGISTER_TEST(pairwise),
         REGISTER_TEST(pairwiseWrap),
+        REGISTER_TEST(reduce),
         REGISTER_TEST(tail),
 
         // register new test cases here ...

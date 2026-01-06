@@ -189,6 +189,23 @@ namespace Seq
         }
     }
 
+    template<typename Accumulator, typename Reduction>
+    inline auto reduce(Accumulator&& accum, Reduction&& reduce)
+    {
+        return [accum = std::forward<Accumulator>(accum), reduce = std::forward<Reduction>(reduce)]<typename T>(
+                   IEnumerable<T> sequence) -> Accumulator
+        {
+            Accumulator out = accum;
+
+            for (const auto& elem : sequence)
+            {
+                out = reduce(elem, out);
+            }
+
+            return out;
+        };
+    }
+
     inline auto tail()
     {
         return []<typename T>(IEnumerable<T> sequence) -> IEnumerable<T>
