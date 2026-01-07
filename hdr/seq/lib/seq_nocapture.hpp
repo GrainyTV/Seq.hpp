@@ -58,4 +58,16 @@ namespace Seq::_internal
             co_yield static_cast<Mapping>(mapping)(elem);
         }
     }
+
+    template<typename RetVal, typename T, typename Mapping>
+    inline auto mapWithIndexNoCapture(IEnumerable<T> sequence, ByValue<Mapping> mapping) -> IEnumerable<RetVal>
+    {
+        std::size_t idx = 0;
+
+        for (const auto& elem : sequence)
+        {
+            co_yield static_cast<Mapping>(mapping)(elem, idx);
+            ++idx;
+        }
+    }
 }

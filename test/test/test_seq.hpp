@@ -92,14 +92,34 @@ namespace SeqTest
     {
         const std::vector<std::string> fruits{"Apple", "Banana", "Orange", "Watermelon"};
 
-        auto fruitLengths = fruits | Seq::map([](const std::string& fruit) { return fruit.size(); }) | Seq::toVector();
+        // Without index
 
-        Assert::equal(fruitLengths, {5, 6, 6, 10});
+        {
+            auto fruitLengths =
+                fruits
+                | Seq::map([](const std::string& fruit) { return fruit.size(); })
+                | Seq::toVector();
 
-        auto fruitSlices =
-            fruits | Seq::map([](const std::string& fruit) { return fruit.substr(1, 3); }) | Seq::toVector();
+            Assert::equal(fruitLengths, {5, 6, 6, 10});
 
-        Assert::equal(fruitSlices, {"ppl", "ana", "ran", "ate"});
+            auto fruitSlices =
+                fruits
+                | Seq::map([](const std::string& fruit) { return fruit.substr(1, 3); })
+                | Seq::toVector();
+
+            Assert::equal(fruitSlices, {"ppl", "ana", "ran", "ate"});
+        }
+
+        // With index
+
+        {
+            auto fruitLengths =
+                fruits
+                | Seq::mapi([](const std::string& fruit, std::size_t idx) { return fruit.size() + idx; })
+                | Seq::toVector();
+
+            Assert::equal(fruitLengths, {5, 7, 8, 13});
+        }
     }
 
     static void pairwise()
@@ -153,6 +173,12 @@ namespace SeqTest
                           {1, 2},
                           {2, 1}
         });
+    }
+
+    static void range()
+    {
+        Assert::equal(Seq::range(5) | Seq::toVector(), {0, 1, 2, 3, 4});
+        Assert::equal(Seq::range(1, 5) | Seq::toVector(), {1, 2, 3, 4});
     }
 
     static void reduce()
@@ -215,6 +241,7 @@ namespace SeqTest
         REGISTER_TEST(map),
         REGISTER_TEST(pairwise),
         REGISTER_TEST(pairwiseWrap),
+        REGISTER_TEST(range),
         REGISTER_TEST(reduce),
         REGISTER_TEST(tail),
 
