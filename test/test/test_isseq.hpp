@@ -3,6 +3,8 @@
 
 namespace IsSeqTest
 {
+    using Seq::_internal::TypeInspect::EnsureIsSeq;
+
     static_assert(EnsureIsSeq<const char*>);
     static_assert(EnsureIsSeq<std::string>);
     static_assert(EnsureIsSeq<std::vector<int>>);

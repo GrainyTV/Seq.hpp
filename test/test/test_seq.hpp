@@ -216,6 +216,18 @@ namespace SeqTest
         Assert::equal(splitTextByNewline, {{"apple", "banana", "pear"}, "watermelon"});
     }
 
+    static void sum()
+    {
+        auto firstFiveInteger = {1, 2, 3, 4, 5};
+        Assert::equal(firstFiveInteger | Seq::sum(), 15);
+
+        const std::vector<uint32_t> unsignedInts = {1, 2, 3, 4, 5};
+        Assert::equal(unsignedInts | Seq::sum(), 15u);
+
+        auto intsWithOverflow = {std::numeric_limits<int>::max(), 1};
+        Assert::equal(intsWithOverflow | Seq::sum<uint64_t>(), 2147483648ul);
+    }
+
     static void tail()
     {
         auto firstFiveInteger = {1, 2, 3, 4, 5};
@@ -243,6 +255,7 @@ namespace SeqTest
         REGISTER_TEST(pairwiseWrap),
         REGISTER_TEST(range),
         REGISTER_TEST(reduce),
+        REGISTER_TEST(sum),
         REGISTER_TEST(tail),
 
         // register new test cases here ...

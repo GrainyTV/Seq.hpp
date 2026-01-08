@@ -1,25 +1,24 @@
 #pragma once
 #include "lib/config.hpp"
+#include "lib/seq_helper.hpp"
 #include "lib/seq_nocapture.hpp"
 #include "lib/type_inspect_utils.hpp"
 
 #include <optional>
 #include <string>
 
-template<typename Seq>
-IEnumerable<ItemOf<Seq>> wrapAsIEnumerable(ByValue<Seq> sequence)
-{
-    for (const auto& elem : static_cast<Seq>(sequence))
-    {
-        co_yield elem;
-    }
-}
+// template<typename Seq>
+// IEnumerable<ItemOf<Seq>> wrapAsIEnumerable(ByValue<Seq> sequence)
+// {
+//     for (const auto& elem : static_cast<Seq>(sequence))
+//     {
+//         co_yield elem;
+//     }
+// }
 
 template<typename Func, typename T>
 auto operator|(IEnumerable<T>&& enumerable, Func&& function)
 {
-    //static_assert(IS_INVOKABLE<Func, IEnumerable<T>>,
-    //              "Right hand side of pipe operator is NOT a proper IEnumerable closure in this context");
     return std::forward<Func>(function)(std::move(enumerable));
 }
 
@@ -29,10 +28,10 @@ auto operator|(IEnumerable<T>& enumerable, Func&& function)
     return std::move(enumerable) | std::forward<Func>(function);
 }
 
-template<EnsureIsSeq Seq, typename Func>
-auto operator|(const Seq& sequence, Func&& function)
+template<Seq::_internal::TypeInspect::EnsureIsSeq SeqT, typename Func>
+auto operator|(const SeqT& sequence, Func&& function)
 {
-    return wrapAsIEnumerable(ByValue(sequence)) | std::forward<Func>(function);
+    return Seq::_internal::wrapAsIEnumerable(ByValue(sequence)) | std::forward<Func>(function);
 }
 
 namespace Seq
@@ -114,7 +113,7 @@ namespace Seq
     {
         return [action = std::forward<Action>(action)]<typename T>(IEnumerable<T> sequence) -> void
         {
-            static_assert(IS_INVOKABLE<Action, T>);
+            static_assert(_internal::TypeInspect::IS_INVOKABLE<Action, T>);
 
             for (const auto& elem : sequence)
             {
@@ -130,7 +129,7 @@ namespace Seq
     {
         return [action = std::forward<Action>(action)]<typename T>(IEnumerable<T> sequence) -> void
         {
-            static_assert(IS_INVOKABLE<Action, T, std::size_t>);
+            static_assert(_internal::TypeInspect::IS_INVOKABLE<Action, T, std::size_t>);
 
             std::size_t idx = 0;
 
@@ -165,8 +164,8 @@ namespace Seq
     {
         return [mapping = std::forward<Mapping>(mapping)]<typename T>(IEnumerable<T> sequence) -> auto
         {
-            static_assert(IS_INVOKABLE<Mapping, T>);
-            using U = ReturnValueOf<Mapping, T>;
+            static_assert(_internal::TypeInspect::IS_INVOKABLE<Mapping, T>);
+            using U = _internal::TypeInspect::ReturnValueOf<Mapping, T>;
 
             return _internal::mapNoCapture<U>(std::move(sequence), ByValue(mapping));
         };
@@ -179,8 +178,8 @@ namespace Seq
     {
         return [mapping = std::forward<Mapping>(mapping)]<typename T>(IEnumerable<T> sequence) -> auto
         {
-            static_assert(IS_INVOKABLE<Mapping, T, std::size_t>);
-            using U = ReturnValueOf<Mapping, T, std::size_t>;
+            static_assert(_internal::TypeInspect::IS_INVOKABLE<Mapping, T, std::size_t>);
+            using U = _internal::TypeInspect::ReturnValueOf<Mapping, T, std::size_t>;
 
             return _internal::mapWithIndexNoCapture<U>(std::move(sequence), ByValue(mapping));
         };
@@ -276,6 +275,28 @@ namespace Seq
         };
     }
 
+    // `Seq::sum` returns the sum of the sequence. Supports integrals, float and double.
+    // By default it will try to find a suitable fallback type up to uint32_t.
+    // If you need extra control you can change UserOverride to something else like uint64_t.
+    template<typename UserOverride = void>
+    inline auto sum()
+    {
+        return []<typename T>(IEnumerable<T> sequence) -> auto
+        {
+            using _internal::TypeInspect::IS_SUMMABLE;
+            static_assert(IS_SUMMABLE<T>, "Sum function only supports integrals, float and double");
+
+            if constexpr (IS_SUMMABLE<UserOverride>)
+            {
+                return _internal::sum(std::move(sequence), UserOverride{});
+            }
+            else
+            {
+                return _internal::sum(std::move(sequence), _internal::TypeInspect::FallbackSumInitial<T>{});
+            }
+        };
+    }
+
     // `Seq::tail` returns all elements of the sequence EXCEPT the first one.
     inline auto tail()
     {
@@ -295,6 +316,8 @@ namespace Seq
         };
     }
 
+    // `Seq::toString` consumes a char sequence by returning its string representation.
+    // The initially reserved capacity and shrink parameters are configurable.
     template<std::size_t InitialReserve = 16, bool EnableShrink = false>
     inline auto toString()
     {
@@ -317,6 +340,9 @@ namespace Seq
         };
     }
 
+    // `Seq::toVector` consumes a sequence by returning its vector representation.
+    // The initially reserved capacity and shrink parameters are configurable.
+    // You might want to look at `Seq::toString` if you have a char sequence.
     template<std::size_t InitialReserve = 16, bool EnableShrink = false>
     inline auto toVector()
     {
