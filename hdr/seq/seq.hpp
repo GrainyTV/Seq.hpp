@@ -237,21 +237,37 @@ namespace Seq
         };
     }
 
-    // `Seq::range` returns all integers from the interval [min, max).
+    // `Seq::range` returns every nth(=step) value from the interval [min, max).
+    // Parameter step is allowed to be both positive and negative but NOT zero.
     // This works the same way as Python's built-in range function.
-    inline auto range(int inclusiveMin, int exclusiveMax) -> IEnumerable<int>
+    // Check their docs for more info: https://docs.python.org/3/library/stdtypes.html#range.
+    template<_internal::TypeInspect::EnsureIsIntegral T>
+    inline auto range(T inclusiveMin, T exclusiveMax, T step) -> IEnumerable<T>
     {
-        for (int i = inclusiveMin; i < exclusiveMax; ++i)
+        if (step > 0)
         {
-            co_yield i;
+            return _internal::rangeIncreasing(inclusiveMin, exclusiveMax, step);
         }
+
+        return _internal::rangeDecreasing(inclusiveMin, exclusiveMax, step);
     }
 
-    // `Seq::range` returns all integers from the interval [0, max).
+    // `Seq::range` returns all values from the interval [min, max).
     // This works the same way as Python's built-in range function.
-    inline auto range(int exclusiveMax) -> IEnumerable<int>
+    // Check their docs for more info: https://docs.python.org/3/library/stdtypes.html#range.
+    template<_internal::TypeInspect::EnsureIsIntegral T>
+    inline auto range(T inclusiveMin, T exclusiveMax) -> IEnumerable<T>
     {
-        return Seq::range(0, exclusiveMax);
+        return Seq::range(inclusiveMin, exclusiveMax, static_cast<T>(1));
+    }
+
+    // `Seq::range` returns all values from the interval [0, max).
+    // This works the same way as Python's built-in range function.
+    // Check their docs for more info: https://docs.python.org/3/library/stdtypes.html#range.
+    template<_internal::TypeInspect::EnsureIsIntegral T>
+    inline auto range(T exclusiveMax) -> IEnumerable<T>
+    {
+        return Seq::range(static_cast<T>(0), exclusiveMax);
     }
 
     // `Seq::reduce` continuously applies a reduction function to the next element of the sequence and

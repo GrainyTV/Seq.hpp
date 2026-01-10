@@ -177,8 +177,30 @@ namespace SeqTest
 
     static void range()
     {
+        // Basic integers
+
         Assert::equal(Seq::range(5) | Seq::toVector(), {0, 1, 2, 3, 4});
         Assert::equal(Seq::range(1, 5) | Seq::toVector(), {1, 2, 3, 4});
+
+        // Huge long numbers
+
+        Assert::equal(Seq::range(222222222222222, 222222222222225) | Seq::toVector(),
+                      {222222222222222,
+                       222222222222223,
+                       222222222222224});
+
+        // With steps
+
+        Assert::equal(Seq::range(0, 30, 5) | Seq::toVector(), {0, 5, 10, 15, 20, 25});
+        Assert::equal(Seq::range(0, 10, 3) | Seq::toVector(), {0, 3, 6, 9});
+
+        // With negative steps
+
+        Assert::equal(Seq::range(0, -10, -1) | Seq::toVector(), {0, -1, -2, -3, -4, -5, -6, -7, -8, -9});
+
+        // Empty
+
+        Assert::truthy(Seq::range(0) | Seq::isEmpty());
     }
 
     static void reduce()
@@ -188,32 +210,43 @@ namespace SeqTest
         auto intsWithCharacters =
             firstFiveInteger
             | Seq::reduce(std::unordered_map<int, char>{}, [](int n, auto map) {
-                    map.emplace(n, 'A' + n);
-                    return map;
-                });
+                  map.emplace(n, 'A' + n);
+                  return map;
+              });
 
-        Assert::equal(intsWithCharacters, {{1, 'B'}, {2, 'C'}, {3, 'D'}, {4, 'E'}, {5, 'F'}});
+        Assert::equal(intsWithCharacters,
+                      {
+                          {1, 'B'},
+                          {2, 'C'},
+                          {3, 'D'},
+                          {4, 'E'},
+                          {5, 'F'}
+        });
 
         const std::string fruitText = "\napple\n\nbanana\npear\nwatermelon";
 
         auto splitTextByNewline =
             fruitText
             | Seq::reduce(std::pair<std::vector<std::string>, std::string>{}, [](char chr, auto& accum) {
-                    std::vector<std::string>& out = accum.first;
-                    std::string& current          = accum.second;
+                  std::vector<std::string>& out = accum.first;
+                  std::string& current          = accum.second;
 
-                    if (chr == '\n' && !current.empty())
-                    {
-                        out.emplace_back(current);
-                        current.clear();
+                  if (chr == '\n' && !current.empty())
+                  {
+                      out.emplace_back(current);
+                      current.clear();
 
-                        return std::make_pair(out, current);
-                    }
+                      return std::make_pair(out, current);
+                  }
 
-                    return std::make_pair(out, chr == '\n' ? current : current + chr);
-                });
+                  return std::make_pair(out, chr == '\n' ? current : current + chr);
+              });
 
-        Assert::equal(splitTextByNewline, {{"apple", "banana", "pear"}, "watermelon"});
+        Assert::equal(splitTextByNewline,
+                      {
+                          {"apple", "banana", "pear"},
+                          "watermelon"
+        });
     }
 
     static void sum()

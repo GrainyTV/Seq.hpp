@@ -29,6 +29,9 @@ namespace Seq::_internal::TypeInspect
     constexpr bool IS_LESS_THAN_4_BYTE_INTEGRAL = std::is_integral_v<T> && sizeof(T) < 4;
 
     template<typename T>
+    concept EnsureIsIntegral = std::is_integral_v<T>;
+
+    template<typename T>
     concept EnsureIsSummable = std::is_integral_v<T> || IS<T, float> || IS<T, double>;
 
     template<typename T>

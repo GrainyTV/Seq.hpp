@@ -26,4 +26,22 @@ namespace Seq::_internal
 
         return accum;
     }
+
+    template<typename T>
+    auto rangeIncreasing(T inclusiveMin, T exclusiveMax, T step) -> IEnumerable<T>
+    {
+        for (T i = inclusiveMin; i < exclusiveMax; i += step)
+        {
+            co_yield i;
+        }
+    }
+
+    template<typename T>
+    auto rangeDecreasing(T inclusiveMin, T exclusiveMax, T step) -> IEnumerable<T>
+    {
+        for (T i = inclusiveMin; i > exclusiveMax; i += step)
+        {
+            co_yield i;
+        }
+    }
 }
