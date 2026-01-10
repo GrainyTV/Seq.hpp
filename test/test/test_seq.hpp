@@ -218,6 +218,12 @@ namespace SeqTest
 
     static void sum()
     {
+        auto booleans = {true, false, true, true};
+        Assert::equal(booleans | Seq::sum(), 3);
+
+        auto characters = {'a', 'b', 'c'};
+        Assert::equal(characters | Seq::sum(), 294);
+
         auto firstFiveInteger = {1, 2, 3, 4, 5};
         Assert::equal(firstFiveInteger | Seq::sum(), 15);
 

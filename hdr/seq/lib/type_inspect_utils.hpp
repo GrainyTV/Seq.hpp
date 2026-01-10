@@ -26,20 +26,11 @@ namespace Seq::_internal::TypeInspect
     constexpr bool IS = std::is_same_v<T1, T2>;
 
     template<typename T>
-    constexpr bool LESS_THAN_4_BYTE_INTEGRAL = sizeof(T) < 4;
+    constexpr bool IS_LESS_THAN_4_BYTE_INTEGRAL = std::is_integral_v<T> && sizeof(T) < 4;
 
     template<typename T>
-    constexpr bool SIGNED_4_BYTE_INTEGRAL = sizeof(T) == 4 && std::is_signed_v<T>;
+    concept EnsureIsSummable = std::is_integral_v<T> || IS<T, float> || IS<T, double>;
 
     template<typename T>
-    constexpr bool IS_SUMMABLE = std::is_integral_v<T> || IS<T, float> || IS<T, double>;
-
-    template<typename T>
-    constexpr bool IS_SMALL_INT = LESS_THAN_4_BYTE_INTEGRAL<T> || SIGNED_4_BYTE_INTEGRAL<T>;
-
-    template<typename T>
-    using FallbackSumInitial =
-        std::conditional_t<IS<T, float>, float,
-            std::conditional_t<IS<T, double>, double,
-                std::conditional_t<IS_SMALL_INT<T>, int32_t, uint32_t>>>;
+    using FallbackSumInitial = std::conditional_t<IS_LESS_THAN_4_BYTE_INTEGRAL<T>, int32_t, T>;
 }

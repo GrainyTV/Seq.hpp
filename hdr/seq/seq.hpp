@@ -276,23 +276,27 @@ namespace Seq
     }
 
     // `Seq::sum` returns the sum of the sequence. Supports integrals, float and double.
-    // By default it will try to find a suitable fallback type up to uint32_t.
-    // If you need extra control you can change UserOverride to something else like uint64_t.
+    // By default it will use the T type of the sequence unless T is smaller than 4 bytes.
+    // In those case (e.g. int16_t, char or bool) it uses int32_t.
+    // If you know that an overflow will occur you can change UserOverride to a larger type.
     template<typename UserOverride = void>
     inline auto sum()
     {
-        return []<typename T>(IEnumerable<T> sequence) -> auto
-        {
-            using _internal::TypeInspect::IS_SUMMABLE;
-            static_assert(IS_SUMMABLE<T>, "Sum function only supports integrals, float and double");
+        using _internal::TypeInspect::EnsureIsSummable;
+        using _internal::TypeInspect::FallbackSumInitial;
 
-            if constexpr (IS_SUMMABLE<UserOverride>)
+        return []<EnsureIsSummable T>(IEnumerable<T> sequence) -> auto
+        {
+            if constexpr (EnsureIsSummable<UserOverride>)
             {
+                static_assert(sizeof(UserOverride) >= sizeof(T),
+                              "UserOverride type in Seq::sum cannot be smaller than the input's T type");
+
                 return _internal::sum(std::move(sequence), UserOverride{});
             }
             else
             {
-                return _internal::sum(std::move(sequence), _internal::TypeInspect::FallbackSumInitial<T>{});
+                return _internal::sum(std::move(sequence), FallbackSumInitial<T>{});
             }
         };
     }
