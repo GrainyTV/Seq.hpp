@@ -12,8 +12,8 @@ Checks:
   - '-*magic-numbers'
   - '-*narrowing-conversions'
 # Remove individual entries
+  - '-bugprone-easily-swappable-parameters'
   - '-modernize-use-nodiscard'
-  - '-modernize-use-trailing-return-type'
   - '-readability-math-missing-parentheses'
   - '-readability-identifier-length'
   - '-readability-use-anyofallof'
@@ -112,10 +112,12 @@ Checks:
 CheckOptions:
   misc-const-correctness.AnalyzeValues: true
   cppcoreguidelines-avoid-non-const-global-variables.AllowInternalLinkage: true
+  cppcoreguidelines-macro-usage.AllowedRegexp: 'ASSERT*'
   readability-uppercase-literal-suffix.NewSuffixes: u;l;ul;lu;ll;ull;llu;z;uz;zu;f
   readability-identifier-naming.ClassCase: 'CamelCase'
   readability-identifier-naming.StructCase: 'CamelCase'
   readability-identifier-naming.NamespaceCase: 'CamelCase'
+  readability-identifier-naming.NamespaceIgnoredRegexp: '_internal'
   readability-identifier-naming.EnumCase: 'CamelCase'
   readability-identifier-naming.FunctionCase: 'camelBack'
   readability-identifier-naming.VariableCase: 'camelBack'
