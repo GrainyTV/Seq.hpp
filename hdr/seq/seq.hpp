@@ -1,20 +1,12 @@
 #pragma once
 #include "lib/config.hpp"
+#include "lib/debug.hpp"
 #include "lib/seq_helper.hpp"
 #include "lib/seq_nocapture.hpp"
 #include "lib/type_inspect_utils.hpp"
 
 #include <optional>
 #include <string>
-
-// template<typename Seq>
-// IEnumerable<ItemOf<Seq>> wrapAsIEnumerable(ByValue<Seq> sequence)
-// {
-//     for (const auto& elem : static_cast<Seq>(sequence))
-//     {
-//         co_yield elem;
-//     }
-// }
 
 template<typename Func, typename T>
 auto operator|(IEnumerable<T>&& enumerable, Func&& function)
@@ -244,6 +236,8 @@ namespace Seq
     template<_internal::TypeInspect::EnsureIsIntegral T>
     inline auto range(T inclusiveMin, T exclusiveMax, T step) -> IEnumerable<T>
     {
+        ASSERT(step != static_cast<T>(0), "Parameter step of `Seq::range` MUST NOT be 0");
+
         if (step > 0)
         {
             return _internal::rangeIncreasing(inclusiveMin, exclusiveMax, step);
