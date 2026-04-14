@@ -31,6 +31,26 @@ namespace SeqTest
         Assert::equal(eachDigit, {{'1'}, {'2'}, {'3'}, {'4'}, {'5'}});
     }
 
+    static void contains()
+    {
+        auto firstFiveInteger = std::vector{1, 2, 3, 4, 5};
+        auto hasThree         = firstFiveInteger | Seq::contains(firstFiveInteger.at(2));
+        auto hasSix           = firstFiveInteger | Seq::contains(6);
+
+        Assert::truthy(hasThree);
+        Assert::falsey(hasSix);
+    }
+
+    static void count()
+    {
+        auto firstFiveInteger = {1, 2, 3, 4, 5};
+        auto evenNumbersCount = firstFiveInteger | Seq::count([](int n) { return n % 2 == 0; });
+        auto largerThanSix    = firstFiveInteger | Seq::count([](int n) { return n > 6; });
+
+        Assert::equal(evenNumbersCount, 2ul);
+        Assert::equal(largerThanSix, 0ul);
+    }
+
     static void exists()
     {
         auto firstFiveInteger = {1, 2, 3, 4, 5};
@@ -284,6 +304,8 @@ namespace SeqTest
 
     constexpr std::array CASES = {
         REGISTER_TEST(chunkBySize),
+        REGISTER_TEST(contains),
+        REGISTER_TEST(count),
         REGISTER_TEST(exists),
         REGISTER_TEST(filter),
         REGISTER_TEST(forall),

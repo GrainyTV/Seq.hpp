@@ -38,6 +38,45 @@ namespace Seq
         };
     }
 
+    // `Seq::contains` tests whether a given element is found in the input sequence.
+    template<typename T>
+    inline auto contains(const T& needed)
+    {
+        return [needed](IEnumerable<T> sequence) -> bool
+        {
+            for (const auto& elem : sequence)
+            {
+                if (elem == needed)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+    }
+
+    // `Seq::count` returns how many elements in the input sequence satisfy a predicate.
+    // Parameter pred has signature `(T) -> bool`.
+    template<typename Predicate>
+    inline auto count(Predicate&& pred)
+    {
+        return [pred = std::forward<Predicate>(pred)]<typename T>(IEnumerable<T> sequence) -> std::size_t
+        {
+            std::size_t count = 0;
+
+            for (const auto& elem : sequence)
+            {
+                if (pred(elem))
+                {
+                    ++count;
+                }
+            }
+
+            return count;
+        };
+    }
+
     // `Seq::exists` is a sibling function of `Seq::forall`.
     // Tests whether AT LEAST one element of the sequence satisfies the predicate.
     // Parameter pred has signature `(T) -> bool`.
