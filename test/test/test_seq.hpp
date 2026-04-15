@@ -116,16 +116,12 @@ namespace SeqTest
 
         {
             auto fruitLengths =
-                fruits
-                | Seq::map([](const std::string& fruit) { return fruit.size(); })
-                | Seq::toVector();
+                fruits | Seq::map([](const std::string& fruit) { return fruit.size(); }) | Seq::toVector();
 
             Assert::equal(fruitLengths, {5, 6, 6, 10});
 
             auto fruitSlices =
-                fruits
-                | Seq::map([](const std::string& fruit) { return fruit.substr(1, 3); })
-                | Seq::toVector();
+                fruits | Seq::map([](const std::string& fruit) { return fruit.substr(1, 3); }) | Seq::toVector();
 
             Assert::equal(fruitSlices, {"ppl", "ana", "ran", "ate"});
         }
@@ -205,9 +201,7 @@ namespace SeqTest
         // Huge long numbers
 
         Assert::equal(Seq::range(222222222222222, 222222222222225) | Seq::toVector(),
-                      {222222222222222,
-                       222222222222223,
-                       222222222222224});
+                      {222222222222222, 222222222222223, 222222222222224});
 
         // With steps
 
@@ -227,12 +221,13 @@ namespace SeqTest
     {
         auto firstFiveInteger = {1, 2, 3, 4, 5};
 
-        auto intsWithCharacters =
-            firstFiveInteger
-            | Seq::reduce(std::unordered_map<int, char>{}, [](int n, auto map) {
-                  map.emplace(n, 'A' + n);
-                  return map;
-              });
+        auto intsWithCharacters = firstFiveInteger
+                                  | Seq::reduce(std::unordered_map<int, char>{},
+                                                [](int n, auto map)
+                                                {
+                                                    map.emplace(n, 'A' + n);
+                                                    return map;
+                                                });
 
         Assert::equal(intsWithCharacters,
                       {
@@ -245,22 +240,23 @@ namespace SeqTest
 
         const std::string fruitText = "\napple\n\nbanana\npear\nwatermelon";
 
-        auto splitTextByNewline =
-            fruitText
-            | Seq::reduce(std::pair<std::vector<std::string>, std::string>{}, [](char chr, auto& accum) {
-                  std::vector<std::string>& out = accum.first;
-                  std::string& current          = accum.second;
+        auto splitTextByNewline = fruitText
+                                  | Seq::reduce(std::pair<std::vector<std::string>, std::string>{},
+                                                [](char chr, auto& accum)
+                                                {
+                                                    std::vector<std::string>& out = accum.first;
+                                                    std::string& current          = accum.second;
 
-                  if (chr == '\n' && !current.empty())
-                  {
-                      out.emplace_back(current);
-                      current.clear();
+                                                    if (chr == '\n' && !current.empty())
+                                                    {
+                                                        out.emplace_back(current);
+                                                        current.clear();
 
-                      return std::make_pair(out, current);
-                  }
+                                                        return std::make_pair(out, current);
+                                                    }
 
-                  return std::make_pair(out, chr == '\n' ? current : current + chr);
-              });
+                                                    return std::make_pair(out, chr == '\n' ? current : current + chr);
+                                                });
 
         Assert::equal(splitTextByNewline,
                       {

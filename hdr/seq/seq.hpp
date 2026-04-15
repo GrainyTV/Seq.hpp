@@ -310,8 +310,8 @@ namespace Seq
     template<typename Accumulator, typename Reduction>
     inline auto reduce(Accumulator&& accum, Reduction&& reduce)
     {
-        return [accum = std::forward<Accumulator>(accum), reduce = std::forward<Reduction>(reduce)]<typename T>(
-                   IEnumerable<T> sequence) -> Accumulator
+        return [accum  = std::forward<Accumulator>(accum),
+                reduce = std::forward<Reduction>(reduce)]<typename T>(IEnumerable<T> sequence) -> Accumulator
         {
             Accumulator out = accum;
 

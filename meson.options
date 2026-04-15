@@ -1,2 +1,1 @@
-option('tests', type: 'boolean', value: false)
-option('examples', type: 'boolean', value: false)
+option('enable_dev', type: 'boolean', value: false, description: 'Enable developer mode')

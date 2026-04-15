@@ -1,7 +1,7 @@
 #pragma once
 #include <format>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 // ┏━━━━━━━━━━━━━┓
 // ┃ std::vector ┃
@@ -74,7 +74,7 @@ template<typename Key, typename T, typename CharT>
 struct std::formatter<std::unordered_map<Key, T>, CharT>
 {
     std::formatter<Key, CharT> key_formatter;
-    std::formatter<T,   CharT> value_formatter;
+    std::formatter<T, CharT> value_formatter;
 
     constexpr auto parse(std::basic_format_parse_context<CharT>& ctx)
     {
@@ -92,10 +92,10 @@ struct std::formatter<std::unordered_map<Key, T>, CharT>
         std::size_t i = 0;
         for (const auto& [key, value] : map)
         {
-            out = key_formatter.format(key, ctx);
+            out    = key_formatter.format(key, ctx);
             *out++ = CharT(':');
             *out++ = CharT(' ');
-            out = value_formatter.format(value, ctx);
+            out    = value_formatter.format(value, ctx);
 
             if (++i < map.size())
             {

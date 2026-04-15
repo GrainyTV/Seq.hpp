@@ -17,7 +17,8 @@ public:
     explicit Failure(sl callsite, std::format_string<Args...> fmt, Args&&... args)
         : reason(std::format(fmt, std::forward<Args>(args)...))
         , at(std::format("@ {}:{}", callsite.file_name(), callsite.line()))
-    {}
+    {
+    }
 
     const char* what() const noexcept override { return reason.c_str(); }
 

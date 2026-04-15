@@ -1,5 +1,6 @@
 #pragma once
 #include "selectors.hpp"
+
 #include <cstdint>
 
 namespace Seq::_internal::TypeInspect

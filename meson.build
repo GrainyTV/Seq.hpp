@@ -5,79 +5,73 @@ project(
     meson_version: '>=1.2.0',
     default_options: {
         'cpp_std': 'c++20',
-        'warning_level': '3',
     },
 )
 
+# ┏━━━━━━━━━┓
+# ┃ Options ┃
+# ┗━━━━━━━━━┛
+enable_dev = get_option('enable_dev')
+
+# ┏━━━━━━━━━┓
+# ┃ Defines ┃
+# ┗━━━━━━━━━┛
 project_name = meson.project_name()
 project_dir = meson.current_source_dir()
+build_dir = meson.current_build_dir()
 header_dir = 'hdr'
+
 test_dir = 'test'
-example_dir = 'examples'
-script_dir = 'scripts'
+test_out_dir = build_dir / test_dir
 
-enable_tests = get_option('tests')
-enable_examples = get_option('examples')
-dev_build = enable_tests and enable_examples
+examples_dir = 'examples'
+examples_out_dir = build_dir / examples_dir
 
-if enable_tests
-    cpp = meson.get_compiler('cpp')
-    prevent_unregistered_test_cases_flag = cpp.get_supported_arguments(
-        '-Werror=unused-function',
-    )
+script_dir = project_dir / 'scripts'
 
-    test_exe = executable(
-        f'@project_name@.tests',
-        test_dir / 'main.cpp',
-        cpp_args: prevent_unregistered_test_cases_flag,
-        include_directories: [header_dir, test_dir],
-        override_options: {
-            'werror': true,
-        },
-    )
+# ┏━━━━━━━━━━━━━━━━━━━┓
+# ┃ Script Entrypoint ┃
+# ┗━━━━━━━━━━━━━━━━━━━┛
+seq_hpp_dep = declare_dependency(
+    include_directories: header_dir,
+)
+meson.override_dependency(project_name, seq_hpp_dep)
 
-    test(
-        f'@project_name@ Test Cases',
-        test_exe,
-        protocol: 'exitcode',
-    )
-
-endif
-
-if enable_examples
-    example_ids = [
-        '001_readme',
-        '005_ienumerable',
-    ]
+if enable_dev
+    target_name = 'dev'
+    example_ids = ['001_readme', '005_ienumerable']
+    examples = []
 
     foreach id : example_ids
-        executable(
+        examples += executable(
             id,
-            example_dir / id / f'@id@.cpp',
-            include_directories: [header_dir],
+            examples_dir / id / '@0@.cpp'.format(id),
+            dependencies: seq_hpp_dep,
+            install: true,
+            install_dir: examples_out_dir,
         )
 
     endforeach
 
-endif
+    cpp_tests = executable(
+        'cpp_tests',
+        test_dir / 'main.cpp',
+        dependencies: seq_hpp_dep,
+        include_directories: test_dir,
+        install: true,
+        install_dir: test_out_dir,
+    )
 
-if dev_build
     run_target(
-        'dev-check',
-        command: [script_dir / 'dev_check.py'],
+        target_name,
+        command: [script_dir / '@0@.py'.format(target_name)],
+        depends: [examples, cpp_tests],
         env: {
-            'MESON_EXE': find_program('meson').full_path(),
-            'NINJA_EXE': find_program('ninja').full_path(),
+            'MESON': find_program('meson').full_path(),
+            'NINJA': find_program('ninja').full_path(),
+            'EXAMPLES_DIR': examples_out_dir,
+            'CPP_TEST_SUITE': cpp_tests.full_path(),
         },
     )
 
 endif
-
-seq_hpp_dep = declare_dependency(
-    include_directories: header_dir,
-    variables: {
-        'pch': project_dir / header_dir / 'seq' / 'seq.hpp',
-    },
-)
-
-meson.override_dependency(project_name, seq_hpp_dep)
