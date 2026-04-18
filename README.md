@@ -11,13 +11,13 @@ int main()
         | Seq::filter([](int n) { return n % 2 == 0; })
         | Seq::map([](int n) { return n * n; });
 
-    for (int s : squares)
-        std::cout << s << " ";
+    for (int s : squares)      // consume sequence
+        std::cout << s << " "; // prints 0 4 16
 }
 ```
 
 ## Getting started
-If you've ever used a functional programming language then you won't have any problems using this library. You can go ahead to the **[usage options](#usage-options)**. You might also want to read the **[rationale](#rationale-and-context)** section to better understand why I created this project.
+If you've ever used a functional programming language then you won't have any problems using this library. You can go ahead to the **[usage options](#usage-options)**. You might also want to read the **[rationale](#rationale)** section.
 
 Otherwise, you can take a look at the **[examples](/examples)** folder to get a feeling for the library.
 
@@ -30,55 +30,44 @@ seq_hpp_dep = dependency('Seq.hpp')
 
 executable('...', '...',
     dependencies: [seq_hpp_dep],
-    cpp_pch: seq_hpp_dep.get_variable('pch') # optional PCH mode to speed up compilation
 )
 ```
 
 **Manually**
 
-Clone the repository and place the `seq` folder to your include directory e.g. `include`. Then make sure the path is visible during compilation using the `-Iinclude` flag and that you are using the `-std=c++20` standard.
+Clone the repository and copy the `seq` folder to your include directory. Make sure you are using at least C++20.
 
 ## Contribution
-If you have new functionality or a better way of writing already existing code then feel free to send in a pull request. In case you run into some bug you can open an issue ticket.
+If you have new functionality or rewrite of existing code, feel free to send in a pull request. In case you run into some bug you can open an issue ticket.
 
-These are the tooling requirements:
-- meson (>=1.2.0)
-- clangd
-- clang-tidy
-- clang-format
+### Project Dependencies
+- `meson` >= 1.2.0
+- `clang-tidy` >= 20
+- `clang-format` >= 20
 
-The library has a soft-dependency on Meson with its default Ninja backend to provide a centralized way of handling auxiliary tasks. I've collected the most important commands below.
-
-1. Creating a folder for build artifacts with the clang compiler in development mode. Note that this also generates `compile_commands.json` which is used by clangd language server.
+### How to Build
+1. Create a build artifact with developer mode enabled. You can specify a compiler of choice.
 ```
-CXX=clang++ meson setup build -Dtests=true -Dexamples=true
+CXX=clang++ meson setup build -Denable_dev=true
 ```
 
-2. Running a custom development check to diagnose common issues.
+2. Change into the newly created folder.
 ```
-meson compile dev-check -C build
-```
-
-3. Running the project's custom C++ test suite.
-```
-meson test --verbose -C build
+cd build
 ```
 
-4. Formatting the source code of the project (sadly no built-in command for this one).
+3. Run the provided dev target. It will build and run the tests and examples, then format the source code.
 ```
-ninja clang-format -C build
-```
-
-5. Formatting the `meson.build` file.
-```
-meson format --inplace
+meson compile dev
 ```
 
-## Rationale and context
-The public API of the library is based on LINQ's [Enumerable class](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable) and F#'s [Seq module](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule) hence the name. They have pretty good documentation if you need to look up what each function does.
+If you didn't encounter any issues running the target, your repository is ready for a pull request.
 
-You might ask why anyone would use this library when `<algorithm>`, `<numeric>` and `<ranges>` already exist for a similar purpose.
+## Rationale
+The public API of the library is based on the LINQ **[Enumerable](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable)** class and **[Seq](https://fsharp.github.io/fsharp-core-docs/reference/fsharp-collections-seqmodule)** module from C# and F# respectively - hence the name. Their documentation is pretty good in case you need to look up what each function does.
 
-The former two suffer from the issue that you have to spam begin-end iterator pairs everywhere. The compiler should be able to infer whether the type of a supplied variable is valid for a given operation but they decided not to, so you fall into this situation where you start copy-pasting iterator functions like a madman, potentially running into runtime errors and the source code generally becomes more cluttered and harder to read.
+You might ask what's the point when `algorithm`, `numeric` and `ranges` already exist for a similar purpose.
 
-Ranges fixes that problem but has its own share. The different function names are unnecessarily long and cryptic. Plus, their signatures are so complex that you have no idea how they work internally.
+With the former two the problem is you have to spam begin-end iterator pairs everywhere. The compiler should be able to infer whether the type of a supplied variable is valid for a given operation but it doesn't, so you fall into this situation where you start copy-pasting iterator functions like a madman, potentially running into runtime errors and the source code generally becomes cluttered.
+
+Ranges is a bit better but still not convenient to use. The provided function names are unnecessarily long and cryptic. Plus, their signatures are so complex that you have no idea how they work internally.
