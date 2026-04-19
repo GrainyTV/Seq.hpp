@@ -39,4 +39,6 @@ int main()
 
     for (int s : squares)         // consume the sequence using a foreach loop
         std::cout << s << " ";    // this prints "0 4 16 "
+
+    std::cout << '\n';
 }
