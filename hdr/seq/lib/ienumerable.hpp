@@ -1,5 +1,6 @@
 #pragma once
 #include <coroutine>
+#include <iterator>
 #include <utility>
 
 template<typename T>
@@ -62,6 +63,11 @@ private:
             : ienumeratorHandle({})
         {
         }
+
+        using iterator_category = std::input_iterator_tag;
+        using difference_type   = std::ptrdiff_t;
+        using value_type        = T;
+        using reference         = T&;
     };
 
     promise_type::Handle ienumerableHandle;

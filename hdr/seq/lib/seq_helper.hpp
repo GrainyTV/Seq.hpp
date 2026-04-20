@@ -3,12 +3,15 @@
 #include "parameter_helpers.hpp"
 #include "type_inspect_utils.hpp"
 
+#include <algorithm>
+#include <vector>
+
 namespace Seq::_internal
 {
     using TypeInspect::ItemOf;
 
     template<typename Seq>
-    IEnumerable<ItemOf<Seq>> wrapAsIEnumerable(ByValue<Seq> sequence)
+    auto wrapAsIEnumerable(ByValue<Seq> sequence) -> IEnumerable<ItemOf<Seq>>
     {
         for (const auto& elem : static_cast<Seq>(sequence))
         {
@@ -42,6 +45,25 @@ namespace Seq::_internal
         for (T i = inclusiveMin; i > exclusiveMax; i += step)
         {
             co_yield i;
+        }
+    }
+
+    template<bool DiscardCompareProperty = false, typename T, typename U = T, typename Compare>
+    auto sortElementsBy(IEnumerable<T> sequence, Compare comp) -> IEnumerable<U>
+    {
+        std::vector<T> buffer{sequence.begin(), sequence.end()};
+        std::sort(buffer.begin(), buffer.end(), comp);
+
+        for (const auto& elem : buffer)
+        {
+            if constexpr (DiscardCompareProperty)
+            {
+                co_yield std::get<0>(elem);
+            }
+            else
+            {
+                co_yield elem;
+            }
         }
     }
 }

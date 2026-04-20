@@ -265,6 +265,27 @@ namespace SeqTest
         });
     }
 
+    static void sort()
+    {
+        const std::vector<int> unsortedNums  = {3, 1, 3, 6, 5};
+        const std::vector<std::string> words = {"a", "bbb", "cccc", "dd"};
+
+        // Builtin ascending sort
+        Assert::equal((unsortedNums | Seq::sort() | Seq::toVector()), {1, 3, 3, 5, 6});
+
+        // Builtin descending sort
+        Assert::equal((unsortedNums | Seq::sortDescending() | Seq::toVector()), {6, 5, 3, 3, 1});
+
+        // Custom ascending sort
+        const auto wordsByLength = words | Seq::sortBy([](const auto& word) { return word.size(); }) | Seq::toVector();
+        Assert::equal(wordsByLength, {"a", "dd", "bbb", "cccc"});
+
+        // Custom descending sort
+        const auto wordsByLengthDesc =
+            words | Seq::sortByDescending([](const auto& word) { return word.size(); }) | Seq::toVector();
+        Assert::equal(wordsByLengthDesc, {"cccc", "bbb", "dd", "a"});
+    }
+
     static void sum()
     {
         auto booleans = {true, false, true, true};
@@ -312,6 +333,7 @@ namespace SeqTest
         REGISTER_TEST(pairwiseWrap),
         REGISTER_TEST(range),
         REGISTER_TEST(reduce),
+        REGISTER_TEST(sort),
         REGISTER_TEST(sum),
         REGISTER_TEST(tail),
 

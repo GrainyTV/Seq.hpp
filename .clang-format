@@ -50,25 +50,7 @@ AllowShortFunctionsOnASingleLine: All
 BinPackArguments: false
 BinPackParameters: false
 BitFieldColonSpacing: Both
-# BraceWrapping:
-#   AfterCaseLabel: true
-#   AfterClass: true
-#   AfterControlStatement: Always
-#   AfterEnum: true
-#   AfterExternBlock: true
-#   AfterFunction: true
-#   AfterNamespace: true
-#   AfterStruct: true
-#   AfterUnion: true
-#   BeforeCatch: true
-#   BeforeElse: true
-#   BeforeWhile: true
-#   IndentBraces: false
-#   SplitEmptyFunction: false
-#   SplitEmptyNamespace: false
-#   SplitEmptyRecord: false
 BreakBeforeBinaryOperators: NonAssignment
-# BreakBeforeBraces: Custom
 BreakBeforeBraces: Allman
 BreakBeforeConceptDeclarations: Always
 BreakBeforeTernaryOperators: true

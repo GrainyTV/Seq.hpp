@@ -324,6 +324,78 @@ namespace Seq
         };
     }
 
+    inline auto sort()
+    {
+        return []<typename T>(IEnumerable<T> sequence) -> IEnumerable<T>
+        {
+            const auto compare = [](const auto& a, const auto& b) -> bool
+            {
+                return a < b;
+            };
+
+            return _internal::sortElementsBy(std::move(sequence), compare);
+        };
+    }
+
+    template<typename Mapping>
+    inline auto sortBy(Mapping&& mapping)
+    {
+        return [mapping = std::forward<Mapping>(mapping)]<typename T>(IEnumerable<T> sequence) -> IEnumerable<T>
+        {
+            using U       = _internal::TypeInspect::ReturnValueOf<Mapping, T>;
+            using PairedT = std::pair<T, U>;
+
+            IEnumerable<PairedT> mappedSequence =
+                sequence | Seq::map([mapping](const auto& elem) { return std::make_pair(elem, mapping(elem)); });
+
+            const auto compare = [](const auto& pair1, const auto& pair2) -> bool
+            {
+                const U prop1 = std::get<1>(pair1);
+                const U prop2 = std::get<1>(pair2);
+
+                return prop1 < prop2;
+            };
+
+            return _internal::sortElementsBy<true, PairedT, T>(std::move(mappedSequence), compare);
+        };
+    }
+
+    template<typename Mapping>
+    inline auto sortByDescending(Mapping&& mapping)
+    {
+        return [mapping = std::forward<Mapping>(mapping)]<typename T>(IEnumerable<T> sequence) -> IEnumerable<T>
+        {
+            using U       = _internal::TypeInspect::ReturnValueOf<Mapping, T>;
+            using PairedT = std::pair<T, U>;
+
+            IEnumerable<PairedT> mappedSequence =
+                sequence | Seq::map([mapping](const auto& elem) { return std::make_pair(elem, mapping(elem)); });
+
+            const auto compare = [](const auto& pair1, const auto& pair2) -> bool
+            {
+                const U prop1 = std::get<1>(pair1);
+                const U prop2 = std::get<1>(pair2);
+
+                return prop1 > prop2;
+            };
+
+            return _internal::sortElementsBy<true, PairedT, T>(std::move(mappedSequence), compare);
+        };
+    }
+
+    inline auto sortDescending()
+    {
+        return []<typename T>(IEnumerable<T> sequence) -> IEnumerable<T>
+        {
+            const auto compare = [](const auto& a, const auto& b) -> bool
+            {
+                return a > b;
+            };
+
+            return _internal::sortElementsBy(std::move(sequence), compare);
+        };
+    }
+
     // `Seq::sum` returns the sum of the sequence. Supports integrals, float and double.
     // By default it will use the T type of the sequence unless T is smaller than 4 bytes.
     // In those case (e.g. int16_t, char or bool) it uses int32_t.
