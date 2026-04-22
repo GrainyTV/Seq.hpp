@@ -265,6 +265,12 @@ namespace SeqTest
         });
     }
 
+    static void skip()
+    {
+        auto firstFiveInteger = {1, 2, 3, 4, 5};
+        Assert::equal((firstFiveInteger | Seq::skip(2) | Seq::toVector()), {3, 4, 5});
+    }
+
     static void sort()
     {
         const std::vector<int> unsortedNums  = {3, 1, 3, 6, 5};
@@ -319,6 +325,12 @@ namespace SeqTest
         Assert::equal(noTail, {});
     }
 
+    static void take()
+    {
+        auto firstFiveInteger = {1, 2, 3, 4, 5};
+        Assert::equal((firstFiveInteger | Seq::take(2) | Seq::toVector()), {1, 2});
+    }
+
     constexpr std::array CASES = {
         REGISTER_TEST(chunkBySize),
         REGISTER_TEST(contains),
@@ -333,9 +345,11 @@ namespace SeqTest
         REGISTER_TEST(pairwiseWrap),
         REGISTER_TEST(range),
         REGISTER_TEST(reduce),
+        REGISTER_TEST(skip),
         REGISTER_TEST(sort),
         REGISTER_TEST(sum),
         REGISTER_TEST(tail),
+        REGISTER_TEST(take),
 
         // register new test cases here ...
     };

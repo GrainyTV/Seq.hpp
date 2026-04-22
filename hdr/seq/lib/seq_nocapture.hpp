@@ -70,4 +70,36 @@ namespace Seq::_internal
             ++idx;
         }
     }
+
+    template<typename T>
+    inline auto skipNoCapture(IEnumerable<T> sequence, std::size_t count) -> IEnumerable<T>
+    {
+        std::size_t index = 0;
+
+        for (const auto& elem : sequence)
+        {
+            if (index >= count)
+            {
+                co_yield elem;
+            }
+
+            ++index;
+        }
+    }
+
+    template<typename T>
+    inline auto takeNoCapture(IEnumerable<T> sequence, std::size_t count) -> IEnumerable<T>
+    {
+        std::size_t index = 0;
+
+        for (const auto& elem : sequence)
+        {
+            if (index < count)
+            {
+                co_yield elem;
+            }
+
+            ++index;
+        }
+    }
 }

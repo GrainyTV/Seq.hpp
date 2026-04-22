@@ -324,6 +324,14 @@ namespace Seq
         };
     }
 
+    inline auto skip(std::size_t count)
+    {
+        return [count]<typename T>(IEnumerable<T> sequence) -> IEnumerable<T>
+        {
+            return _internal::skipNoCapture(std::move(sequence), count);
+        };
+    }
+
     inline auto sort()
     {
         return []<typename T>(IEnumerable<T> sequence) -> IEnumerable<T>
@@ -438,6 +446,14 @@ namespace Seq
 
                 ++index;
             }
+        };
+    }
+
+    inline auto take(std::size_t count)
+    {
+        return [count]<typename T>(IEnumerable<T> sequence) -> IEnumerable<T>
+        {
+            return _internal::takeNoCapture(std::move(sequence), count);
         };
     }
 
