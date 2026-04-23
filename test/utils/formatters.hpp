@@ -1,5 +1,6 @@
 #pragma once
 #include <format>
+#include <optional>
 #include <unordered_map>
 #include <vector>
 
@@ -105,6 +106,43 @@ struct std::formatter<std::unordered_map<Key, T>, CharT>
         }
 
         *out++ = CharT('}');
+        return out;
+    }
+};
+
+// ┏━━━━━━━━━━━━━━━┓
+// ┃ std::optional ┃
+// ┗━━━━━━━━━━━━━━━┛
+template<typename T, typename CharT>
+struct std::formatter<std::optional<T>, CharT>
+{
+    std::formatter<T, CharT> formatter;
+
+    constexpr auto parse(std::basic_format_parse_context<CharT>& ctx) { return formatter.parse(ctx); }
+
+    template<typename FormatContext>
+    auto format(const std::optional<T>& opt, FormatContext& ctx) const
+    {
+        auto out = ctx.out();
+
+        if (opt.has_value())
+        {
+            *out++ = CharT('S');
+            *out++ = CharT('o');
+            *out++ = CharT('m');
+            *out++ = CharT('e');
+            *out++ = CharT('(');
+            out    = formatter.format(*opt, ctx);
+            *out++ = CharT(')');
+        }
+        else
+        {
+            *out++ = CharT('N');
+            *out++ = CharT('o');
+            *out++ = CharT('n');
+            *out++ = CharT('e');
+        }
+
         return out;
     }
 };

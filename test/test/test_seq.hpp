@@ -71,6 +71,18 @@ namespace SeqTest
         Assert::equal(evenNumbers, {2, 4});
     }
 
+    static void find()
+    {
+        auto firstFiveInteger = {1, 2, 3, 4, 5};
+
+        // Index from beginning
+        const auto firstEven = firstFiveInteger | Seq::findIndex([](int i) { return i % 2 == 0; });
+        Assert::equal(firstEven, {1});
+
+        const auto largerThanFive = firstFiveInteger | Seq::findIndex([](int i) { return i > 5; });
+        Assert::equal(largerThanFive, {});
+    }
+
     static void forall()
     {
         auto firstFiveInteger = {1, 2, 3, 4, 5};
@@ -332,24 +344,11 @@ namespace SeqTest
     }
 
     constexpr std::array CASES = {
-        REGISTER_TEST(chunkBySize),
-        REGISTER_TEST(contains),
-        REGISTER_TEST(count),
-        REGISTER_TEST(exists),
-        REGISTER_TEST(filter),
-        REGISTER_TEST(forall),
-        REGISTER_TEST(isEmpty),
-        REGISTER_TEST(length),
-        REGISTER_TEST(map),
-        REGISTER_TEST(pairwise),
-        REGISTER_TEST(pairwiseWrap),
-        REGISTER_TEST(range),
-        REGISTER_TEST(reduce),
-        REGISTER_TEST(skip),
-        REGISTER_TEST(sort),
-        REGISTER_TEST(sum),
-        REGISTER_TEST(tail),
-        REGISTER_TEST(take),
+        REGISTER_TEST(chunkBySize), REGISTER_TEST(contains), REGISTER_TEST(count),    REGISTER_TEST(exists),
+        REGISTER_TEST(filter),      REGISTER_TEST(find),     REGISTER_TEST(forall),   REGISTER_TEST(isEmpty),
+        REGISTER_TEST(length),      REGISTER_TEST(map),      REGISTER_TEST(pairwise), REGISTER_TEST(pairwiseWrap),
+        REGISTER_TEST(range),       REGISTER_TEST(reduce),   REGISTER_TEST(skip),     REGISTER_TEST(sort),
+        REGISTER_TEST(sum),         REGISTER_TEST(tail),     REGISTER_TEST(take),
 
         // register new test cases here ...
     };

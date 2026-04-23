@@ -108,6 +108,27 @@ namespace Seq
         };
     }
 
+    template<typename Predicate>
+    inline auto findIndex(Predicate&& pred)
+    {
+        return [pred = std::forward<Predicate>(pred)]<typename T>(IEnumerable<T> sequence) -> std::optional<std::size_t>
+        {
+            std::size_t index = 0;
+
+            for (const auto& elem : sequence)
+            {
+                if (pred(elem))
+                {
+                    return index;
+                }
+
+                ++index;
+            }
+
+            return {};
+        };
+    }
+
     // `Seq::forall` is a sibling function of `Seq::exists`.
     // Tests whether ALL elements of the sequence satisfy the predicate.
     // Parameter pred has signature `(T) -> bool`.
